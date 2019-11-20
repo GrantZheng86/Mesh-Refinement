@@ -1,4 +1,4 @@
-f = @(ratio) max(ratio); %Returns the worst quality of all the vertices
+f = meshQuality('OLYMPUS XZ-2.STL'); %Returns the worst quality of all the vertices
 %This is our cost function
 
 function ratio = getratio(x0,x1,x2)
