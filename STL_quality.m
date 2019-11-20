@@ -1,7 +1,8 @@
 clc
 clear variables
 close all
-
+% **** JUST A TEST FILE, DO NOT USE FOR FINAL PROJECT *****************
+% **** QUALITY ASSESSMENT HAS ALREADY BEEN INTEGRATED INTO A FUNCTION ****
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is a test file for the mesh quality assessment using the camera STL
 % file
@@ -34,3 +35,5 @@ for i = 1:l
         record = i;
     end
 end
+
+worstCase_usingMethod = meshQuality('OLYMPUS XZ-2.STL'); 
