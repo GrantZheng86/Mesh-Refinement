@@ -3,9 +3,6 @@ f = @(ratio) max(ratio); %Returns the worst quality of all the vertices
 
 function ratio = getratio(x0,x1,x2)
     faceVert = [x0;x1;x2];
-    if i == 43025;
-        temp = 1;
-    end
     inR = inradius(faceVert);
     ciR = circumradius(faceVert);
     ratio = ciR/inR;
