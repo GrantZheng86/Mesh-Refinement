@@ -1,10 +1,11 @@
-function toReturn = meshQuality(fileName)
+function toReturn = meshQuality(F,V)
 % This function measures the mesh qulity for STL file
-% INPUT: fileName -> A string that is the file name
+% INPUT: F -> List of Face Vertex Indices
+% INPUT: V -> List of Vertex Coordinates
 % OUTPUT: toReturn -> a double represent the mesh quality
-    [F,V] = stlread(fileName);
+%    [F,V] = stlread(fileName);
     l = size(F,1);
-    worstCase = 0;
+    worstCase = 1;
     for i = 1:l
         currFace = F(i,:);
         vert1 = V(currFace(1), :);
@@ -13,8 +14,8 @@ function toReturn = meshQuality(fileName)
         faceVert = [vert1; vert2; vert3];
         inR = inradius(faceVert);
         ciR = circumradius(faceVert);
-        ratio = ciR / inR;
-        if ratio > worstCase
+        ratio = inR / ciR;
+        if ratio < worstCase
             worstCase = ratio;
         end
     end
