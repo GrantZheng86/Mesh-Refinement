@@ -5,7 +5,7 @@ function ratio = getratio(x0,x1,x2)
     faceVert = [x0;x1;x2];
     inR = inradius(faceVert);
     ciR = circumradius(faceVert);
-    ratio = ciR/inR;
+    ratio = inR/ciR;
 end
 
 function x_min = backtrack(x,alpha)
@@ -22,7 +22,7 @@ function x_min = backtrack(x,alpha)
         
         x_kratio = getratio(x_k(1),x_k(2),x_k(3)); %get ratio to determine new quality
         
-        if ( x_kratio < getratio(x(1),x(2),x(3)) ) 
+        if ( x_kratio > getratio(x(1),x(2),x(3)) ) 
             x_min = x_k;
         end % get the new vertex the minimizes ratio
     end
