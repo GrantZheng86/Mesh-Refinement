@@ -3,7 +3,6 @@ function toReturn = meshQuality(F,V)
 % INPUT: F -> List of Face Vertex Indices
 % INPUT: V -> List of Vertex Coordinates
 % OUTPUT: toReturn -> a double represent the mesh quality
-%    [F,V] = stlread(fileName);
     l = size(F,1);
     worstCase = 1;
     for i = 1:l

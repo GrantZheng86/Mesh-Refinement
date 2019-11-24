@@ -85,7 +85,7 @@ for ii = 1:l_f
         for jj = 1:3
             edgeList{jj}.vertices = edge(jj, :);
             edgeList{jj}.face = ii;
-            edgeList{jj}.faceCount = 1;
+            edgeList{jj}.faceCount = 
         end
     end
 end
