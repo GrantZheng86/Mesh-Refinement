@@ -95,7 +95,7 @@ for ii = 1:l_f
     else 
         for jj = 1:3
             currEdge = edge(jj, :);
-            edgeFaceInfo = findRepeatEdge(currEdge, edgeList,V);
+            edgeFaceInfo = findRepeatEdge(currEdge, edgeList);
             if(edgeFaceInfo ~= 0)
                 edgeList{edgeFaceInfo}.face(2) = ii;
                 edgeList{edgeFaceInfo}.faceCount = 2;
@@ -115,7 +115,7 @@ for ii = 1:l_f
     
 end
 
-function edgeNum = findRepeatEdge(currEdge, edgeList,V)
+function edgeNum = findRepeatEdge(currEdge, edgeList)
     % this function intends to find repeated edge in the list and return
     % the index for the face
     % INPUT: currEdge -> the currentEdge, a 1x2 array containing vertices
@@ -125,7 +125,7 @@ function edgeNum = findRepeatEdge(currEdge, edgeList,V)
     
     l = length(edgeList);
    
-    edgeNum = 0;
+    
    for ii = 1:l
        testEdge = edgeList{ii}.vertices;
        isSame = testRepeatEdge(currEdge, testEdge,V);
@@ -137,13 +137,7 @@ function edgeNum = findRepeatEdge(currEdge, edgeList,V)
 end
 
 function toReturn = testRepeatEdge(edge1, edge2, V)
-% This function tests for repeating edges, if the two edges are identical
-% The function will return 1, 0 elsewise
-% INPUT: edge1 -> a 2x1 int array that contains vertix index;
-%        edge2 -> same structure as edge1
-%        V -> The matrix of doubles that contains vertix X,Y,Z information
-% OUTPUT: toReturn -> a binary indicator to tell whether edge1 and edge 2
-%                     are the same. 1 for same and 0 otherwise. 
+
     vert1 = edge1(1);
     vert2 = edge1(2);
     vert3 = edge2(1);
