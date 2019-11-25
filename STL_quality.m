@@ -70,30 +70,7 @@ clc
 clear variables
 close all
 
-%% This section is used for removing duplicate vertices
-clc
-clear variable 
-close all
 
-[F, V] = stlread('Circle2d.STL');
-uniqV = uniqueVertices(V);
-l = length(F);
-l_u = length(uniqV);
-
-for i = 1:l
-    currFace = F(i,:);
-    for j = 1:3
-        currVert = currFace(j);
-        for k = 1:l_u
-            if (isRepeat(V(currVert,:), uniqV(k,:)) ~= 0)
-                F(i,j) = k;
-            end
-        end
-    end
-end
-V = uniqV;
-%TR = triangulation(F,V);
-%triplot(TR)
 
 %% This section is used for edge vertices detection
 edgeList = {};
@@ -135,10 +112,6 @@ for i = 1:length(repeatedEdge)
     freeVertices(i,:) = edgeList{repeatedEdge(i)};
 end
 freeVertices = unique(freeVertices);          
-        
-        
-            
-        
 
 %% This section is used for testing repeating vertices
 [F,V] = stlread('Circle2d.STL');
@@ -194,4 +167,25 @@ else
 end
 end
 
+%% This section is used for removing duplicate vertices from STl file import
+
+function [F_n, V_n] = removeDuplicateVertices(F,V)
+    uniqV = uniqueVertices(V);
+    l = length(F);
+    l_u = length(uniqV);
+    tempF = F;
+    for i = 1:l
+        currFace = F(i,:);
+        for j = 1:3
+            currVert = currFace(j);
+            for k = 1:l_u
+                if (isRepeat(V(currVert,:), uniqV(k,:)) ~= 0)
+                    tempF(i,j) = k;
+                end
+            end
+        end
+    end
+    V_n = uniqV;
+    F_n = tempF;
+end
 
