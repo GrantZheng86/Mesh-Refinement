@@ -65,8 +65,12 @@ for i = 1:l
 end
 
 worstCase_usingMethod = meshQuality(F, V); 
+%% This section is used for edge detection
+clc
+clear variables
+close all
 
-%% This section is used for boundary vertices detection
+%% This section is used removing duplicate vertices
 clc
 clear variable 
 close all
@@ -88,8 +92,46 @@ for i = 1:l
     end
 end
 V = uniqV;
-TR = triangulation(F,V);
-triplot(TR)
+%TR = triangulation(F,V);
+%triplot(TR)
+
+%% This section is used for edge vertices detection
+edgeList = {};
+for i = 1:l
+    currFace = F(i,:);
+    edge(1,:) = [currFace(1),currFace(2)];
+    edge(2,:) = [currFace(2), currFace(3)];
+    edge(3,:) = [currFace(1), currFace(3)];
+    kcounter = 1;
+    if isempty(edgeList)
+        edgeList{1} = edge(1,:);
+        edgeList{2} = edge(2,:);
+        edgeList{3} = edge(3,:);
+        counter = 4;
+    else
+        for j = 1:3
+            sameCount = 0;
+            sameRecord = -1;
+            for k = 1:length(edgeList)
+                if (isSameEdge(edgeList{k}, edge(j,:))) == 0
+                    sameCount = sameCount + 1;
+                    sameRecord = k;
+                end
+            end
+            
+            if sameCount == 0
+                edgeList{counter} = edge(j,:);
+                counter = counter + 1;
+            else
+                repeatedEdge(kcounter) = sameRecord;
+                kcounter = kcounter + 1;
+            end
+        end
+    end
+end
+                    
+        
+        
             
         
 
@@ -136,4 +178,15 @@ function toReturn = uniqueVertices(vList)
     end
 end
            
-%% This section is used for edge detection      
+function toReturn = isSameEdge(edge1, edge2)
+
+if (edge1(1) == edge2(1) && edge1(2) == edge2(2))
+    toReturn = 1;
+elseif edge1(1) == edge2(2) && edge1(2) == edge2(1)
+    toReturn = 1;
+else
+    toReturn = 0;
+end
+end
+
+
