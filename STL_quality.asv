@@ -70,7 +70,7 @@ clc
 clear variables
 close all
 
-%% This section is used for removing duplicate vertices
+%% This section is used removing duplicate vertices
 clc
 clear variable 
 close all
@@ -132,9 +132,8 @@ for i = 1:l
 end
 
 for i = 1:length(repeatedEdge)
-    freeVertices(i,:) = edgeList{repeatedEdge(i)};
-end
-freeVertices = unique(freeVertices);          
+    freeVertices(i,:) = edgeList{repeat}
+                    
         
         
             
