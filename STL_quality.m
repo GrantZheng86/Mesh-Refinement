@@ -66,110 +66,74 @@ end
 
 worstCase_usingMethod = meshQuality(F, V); 
 
-%% This section is used to edge detection (2D)
+%% This section is used for boundary vertices detection
 clc
-clear variables
+clear variable 
 close all
 
 [F, V] = stlread('Circle2d.STL');
-l_f = length(F);
-edgeList = {};  % Initialize edge list cell array
-counter = 1;
-for ii = 1:l_f
-    currFace = F(ii,:);
-    edge = zeros(3,2);
-    edge(1,:) = [currFace(1), currFace(2)];
-    edge(2,:) = [currFace(2), currFace(3)];
-    edge(3,:) = [currFace(1), currFace(3)];
-    
-    % initialization Stage
-    if isempty(edgeList) == 1
-        for jj = 1:3
-            edgeList{jj}.vertices = edge(jj, :);
-            edgeList{jj}.face(1) = ii;
-            edgeList{jj}.faceCount = 1;
-            edgeList{jj}.AKA = 'none';    % AKA is reserved for repeating edges
-            counter = counter + 1;
-        end
-        
-    else 
-        for jj = 1:3
-            currEdge = edge(jj, :);
-            edgeFaceInfo = findRepeatEdge(currEdge, edgeList,V);
-            if(edgeFaceInfo ~= 0)
-                edgeList{edgeFaceInfo}.face(2) = ii;
-                edgeList{edgeFaceInfo}.faceCount = 2;
-            else
-                edgeList{counter}.vertices = edge(jj, :);
-                edgeList{counter}.face(1) = ii;
-                edgeList{counter}.faceCount = 1;
-                counter = counter + 1;
+uniqV = uniqueVertices(V);
+l = length(F);
+l_u = length(uniqV);
+
+for i = 1:l
+    currFace = F(i,:);
+    for j = 1:3
+        currVert = currFace(j);
+        for k = 1:l_u
+            if (isRepeat(V(currVert,:), uniqV(k,:)) ~= 0)
+                F(i,j) = k;
             end
         end
-                
-                
     end
-    
-    
-    
-    
 end
+V = uniqV;
+TR = triangulation(F,V);
+triplot(TR)
+            
+        
 
-function edgeNum = findRepeatEdge(currEdge, edgeList,V)
-    % this function intends to find repeated edge in the list and return
-    % the index for the face
-    % INPUT: currEdge -> the currentEdge, a 1x2 array containing vertices
-    %        edgeList -> a cell array of edge struct data
-    % OUTPUT: edgeNum -> returns the index of the repeating edge that is
-    %                    already in the edgeList
-    
-    l = length(edgeList);
+%% This section is used for testing repeating vertices
+[F,V] = stlread('Circle2d.STL');
+temp = uniqueVertices(V);
+
+function toReturn = isRepeat(vert1, vert2)
+% This function tests if the two vertices are the same
+% INPUT: vert1 -> a 3x1 double array indicates the X,Y,Z location of vert1
+%        vert2 -> a 3x1 double array indicates the X,Y,Z location of vert2
+% OUPUT: toReturn -> a binary number that indicates if they are the same or
+%                    not, 1 represent same, 0 represent not
+    dif = zeros(3,1);
+    for i = 1:3
+        dif(i) = abs(vert1(i) - vert2(i));
+    end
    
-    edgeNum = 0;
-   for ii = 1:l
-       testEdge = edgeList{ii}.vertices;
-       isSame = testRepeatEdge(currEdge, testEdge,V);
-       if (isSame ~= 0)
-           edgeNum = ii;
-       end
-       
-   end
-end
-
-function toReturn = testRepeatEdge(edge1, edge2, V)
-% This function tests for repeating edges, if the two edges are identical
-% The function will return 1, 0 elsewise
-% INPUT: edge1 -> a 2x1 int array that contains vertix index;
-%        edge2 -> same structure as edge1
-%        V -> The matrix of doubles that contains vertix X,Y,Z information
-% OUTPUT: toReturn -> a binary indicator to tell whether edge1 and edge 2
-%                     are the same. 1 for same and 0 otherwise. 
-    vert1 = edge1(1);
-    vert2 = edge1(2);
-    vert3 = edge2(1);
-    vert4 = edge2(2);
-    
-    if testRepeatVert(vert1, vert3,V) == 1 && testRepeatVert(vert2, vert4, V) == 1
+    if sum(dif) < 1e-2
         toReturn = 1;
-    elseif testRepeatVert(vert1, vert4,V) == 1 && testRepeatVert(vert2, vert3, V) == 1
-        toReturn = 1;
-    else
+    else 
         toReturn = 0;
     end
-       
 end
-function toReturn = testRepeatVert(vert1, vert2, V)
-    vert1 = V(vert1,:);
-    vert2 = V(vert2,:);
-    
-    toReturn = 1;
-    for ii = 1:3
-        if abs(vert1(ii) - vert2(ii)) < 1e-2
-            toReturn = and(1, toReturn);
-        else
-            toReturn = 0;
-            return
-        end
+
+function toReturn = uniqueVertices(vList)
+    [r, ~] = size(vList);
+    toReturn(1,:) = vList(1,:);
+    counter = 2;
+    for i = 1:r
+       sameCount = 0;
+       [currListLength, ~] = size(toReturn);
+       
+       for j = 1:currListLength
+           if isRepeat(vList(i,:), toReturn(j,:)) ~= 0
+               sameCount = sameCount + 1;
+           end
+       end
+       
+       if sameCount == 0
+           toReturn(counter, :) = vList(i, :);
+           counter = counter + 1;
+       end
     end
 end
-    
+           
+%% This section is used for edge detection      
