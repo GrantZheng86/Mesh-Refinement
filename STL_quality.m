@@ -65,53 +65,57 @@ for i = 1:l
 end
 
 worstCase_usingMethod = meshQuality(F, V); 
-%% This section is used for edge detection
-clc
-clear variables
-close all
+
 
 
 
 %% This section is used for edge vertices detection
-edgeList = {};
-kcounter = 1;
+clc
+clear variables
+close all
+
+[F,V] = stlread('Circle2d.STL');
+[F,V] = removeDuplicateVertices(F,V);
+l = length(F);
+counter = 1;
+
+% Create a cell array for the edges
 for i = 1:l
     currFace = F(i,:);
-    edge(1,:) = [currFace(1),currFace(2)];
-    edge(2,:) = [currFace(2), currFace(3)];
-    edge(3,:) = [currFace(1), currFace(3)];
-    
-    if isempty(edgeList)
-        edgeList{1} = edge(1,:);
-        edgeList{2} = edge(2,:);
-        edgeList{3} = edge(3,:);
-        counter = 4;
-    else
-        for j = 1:3
-            sameCount = 0;
-            sameRecord = -1;
-            for k = 1:length(edgeList)
-                if (isSameEdge(edgeList{k}, edge(j,:))) ~= 0
-                    sameCount = sameCount + 1;
-                    sameRecord = k;
-                end
-            end
-            
-            if sameCount == 0
-                edgeList{counter} = edge(j,:);
-                counter = counter + 1;
-            else
-                repeatedEdge(kcounter) = sameRecord;
-                kcounter = kcounter + 1;
-            end
+    edgeList{counter} = [currFace(1), currFace(2)];
+    edgeList{counter + 1} = [currFace(2), currFace(3)];
+    edgeList{counter + 2} = [currFace(1), currFace(3)];
+    counter = counter + 3;    
+end
+
+% Check for shared edges, if it is shared, push it to another cell array
+counter = 1;
+for i = 1:l
+    repeat = -1;
+    for j = 1:l
+        if isSameEdge(edgeList{i}, edgeList{j}) == 1
+            repeat = repeat + 1;
         end
+    end
+    
+    if repeat == 0
+        nonShareEdge(counter, :) = edgeList{i};
+        counter = counter + 1;
     end
 end
 
-for i = 1:length(repeatedEdge)
-    freeVertices(i,:) = edgeList{repeatedEdge(i)};
-end
-freeVertices = unique(freeVertices);          
+freeVertices = unique(nonShareEdge);
+TR = triangulation(F,V);
+figure(1)
+triplot(TR)
+
+x = V(freeVertices,1);
+y = V(freeVertices,2);
+figure(1)
+hold on
+plot(x,y,'ro')
+
+
 
 %% This section is used for testing repeating vertices
 [F,V] = stlread('Circle2d.STL');
