@@ -74,6 +74,7 @@ close all
 [F, V] = stlread('Circle2d.STL');
 l_f = length(F);
 edgeList = {};  % Initialize edge list cell array
+counter = 1;
 for ii = 1:l_f
     currFace = F(ii,:);
     edge = zeros(3,2);
@@ -81,14 +82,84 @@ for ii = 1:l_f
     edge(2,:) = [currFace(2), currFace(3)];
     edge(3,:) = [currFace(1), currFace(3)];
     
+    % initialization Stage
     if isempty(edgeList) == 1
         for jj = 1:3
             edgeList{jj}.vertices = edge(jj, :);
-            edgeList{jj}.face = ii;
+            edgeList{jj}.face(1) = ii;
             edgeList{jj}.faceCount = 1;
+            counter = counter + 1;
+        end
+        
+    else 
+        for jj = 1:3
+            currEdge = edge(jj, :);
+            edgeFaceInfo = findRepeatEdge(currEdge, edgeList);
+            if(edgeFaceInfo ~= 0)
+                edgeList{edgeFaceInfo}.face(2) = ii;
+                edgeList{edgeFaceInfo}.faceCount = 2;
+            else
+                edgeList{counter}.vertices = edge(jj, :);
+                edgeList{counter}.face(1) = ii;
+                edgeList{counter}.faceCount = 1;
+                counter = counter + 1;
+            end
+        end
+                
+                
+    end
+    
+    
+    
+    
+end
+
+function edgeNum = findRepeatEdge(currEdge, edgeList)
+    % this function intends to find repeated edge in the list and return
+    % the index for the face
+    % INPUT: currEdge -> the currentEdge, a 1x2 array containing vertices
+    %        edgeList -> a cell array of edge struct data
+    % OUTPUT: edgeNum -> returns the index of the repeating edge that is
+    %                    already in the edgeList
+    
+    l = length(edgeList);
+   
+    
+   for ii = 1:l
+       testEdge = edgeList{ii}.vertices;
+       isSame = testRepeatEdge(currEdge, testEdge,V);
+       if (isSame ~= 0)
+       
+   end
+end
+
+function toReturn = testRepeatEdge(edge1, edge2, V)
+    vert1 = edge1(1);
+    vert2 = edge1(2);
+    vert3 = edge2(1);
+    vert4 = edge2(2);
+    
+    if testRepeatVert(vert1, vert3,V) == 1 && testRepeatVert(vert2, vert4, V) == 1
+        toReturn = 1;
+    elseif testRepeatVert(vert1, vert4,V) == 1 && testRepeatVert(vert2, vert3, V) == 1
+        toReturn = 1;
+    else
+        toReturn = 0;
+    end
+       
+end
+function toReturn = testRepeatVert(vert1, vert2, V)
+    vert1 = V(vert1,:);
+    vert2 = V(vert2,:);
+    
+    toReturn = 1;
+    for ii = 1:3
+        if abs(vert1(ii) - vert2(ii)) < 1e-2
+            toReturn = and(1, toReturn);
+        else
+            toReturn = 0;
+            return
         end
     end
 end
-            
-        
     
