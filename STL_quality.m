@@ -74,7 +74,7 @@ clc
 clear variables
 close all
 
-[F,V] = stlread('Circle2d.STL');
+[F,V] = stlread('Circle2d allzero.STL');
 [F,V] = removeDuplicateVertices(F,V);
 l = length(F);
 counter = 1;
@@ -87,12 +87,12 @@ for i = 1:l
     edgeList{counter + 2} = [currFace(1), currFace(3)];
     counter = counter + 3;    
 end
-
+totalEdges = counter - 1;
 % Check for shared edges, if it is shared, push it to another cell array
 counter = 1;
-for i = 1:l
+for i = 1:totalEdges
     repeat = -1;
-    for j = 1:l
+    for j = 1:totalEdges
         if isSameEdge(edgeList{i}, edgeList{j}) == 1
             repeat = repeat + 1;
         end
@@ -103,7 +103,8 @@ for i = 1:l
         counter = counter + 1;
     end
 end
-
+[r,c] = size(nonShareEdge);
+nonShareEdge = reshape(nonShareEdge,[r * c, 1] );
 freeVertices = unique(nonShareEdge);
 TR = triangulation(F,V);
 figure(1)
@@ -118,7 +119,7 @@ plot(x,y,'ro')
 
 
 %% This section is used for testing repeating vertices
-[F,V] = stlread('Circle2d.STL');
+[F,V] = stlread('Circle2d allzero.STL');
 temp = uniqueVertices(V);
 
 function toReturn = isRepeat(vert1, vert2)
@@ -132,7 +133,7 @@ function toReturn = isRepeat(vert1, vert2)
         dif(i) = abs(vert1(i) - vert2(i));
     end
    
-    if sum(dif) < 1e-2
+    if sum(dif) < 1e-3
         toReturn = 1;
     else 
         toReturn = 0;
@@ -140,23 +141,27 @@ function toReturn = isRepeat(vert1, vert2)
 end
 
 function toReturn = uniqueVertices(vList)
+    % vList is a nx3 matrix containing position information for vertices
     [r, ~] = size(vList);
     toReturn(1,:) = vList(1,:);
     counter = 2;
+    
+    % loop through all vertices
     for i = 1:r
        sameCount = 0;
-       [currListLength, ~] = size(toReturn);
+       [currListLength, ~] = size(toReturn); % get the size of the unique vertices
        
-       for j = 1:currListLength
+       for j = 1:currListLength              % loop through all current unique vertices
            if isRepeat(vList(i,:), toReturn(j,:)) ~= 0
                sameCount = sameCount + 1;
            end
        end
        
-       if sameCount == 0
+       if sameCount == 0                    % if the current vertix does not have a repeat, push it to the return matrix
            toReturn(counter, :) = vList(i, :);
            counter = counter + 1;
        end
+       
     end
 end
            
@@ -174,12 +179,18 @@ end
 %% This section is used for removing duplicate vertices from STl file import
 
 function [F_n, V_n] = removeDuplicateVertices(F,V)
+    
+    % unique vertices in the vertix list
     uniqV = uniqueVertices(V);
     l = length(F);
     l_u = length(uniqV);
     tempF = F;
+    
+    % loop through all faces
     for i = 1:l
         currFace = F(i,:);
+        
+        % loop through 3 edges
         for j = 1:3
             currVert = currFace(j);
             for k = 1:l_u
