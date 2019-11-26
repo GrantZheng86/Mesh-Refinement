@@ -105,11 +105,12 @@ for i = 1:totalEdges
 end
 [r,c] = size(nonShareEdge);
 nonShareEdge = reshape(nonShareEdge,[r * c, 1] );
-freeVertices = unique(nonShareEdge);
+
 TR = triangulation(F,V);
 figure(1)
 triplot(TR)
 
+freeVertices = findFreeVertices(F,V);
 x = V(freeVertices,1);
 y = V(freeVertices,2);
 figure(1)
@@ -122,6 +123,7 @@ plot(x,y,'ro')
 [F,V] = stlread('Circle2d allzero.STL');
 temp = uniqueVertices(V);
 
+%% These is the section for functions
 function toReturn = isRepeat(vert1, vert2)
 % This function tests if the two vertices are the same
 % INPUT: vert1 -> a 3x1 double array indicates the X,Y,Z location of vert1
@@ -176,8 +178,6 @@ else
 end
 end
 
-%% This section is used for removing duplicate vertices from STl file import
-
 function [F_n, V_n] = removeDuplicateVertices(F,V)
     
     % unique vertices in the vertix list
@@ -204,3 +204,39 @@ function [F_n, V_n] = removeDuplicateVertices(F,V)
     F_n = tempF;
 end
 
+function toReturn = findFreeVertices(F,V)
+    [F,V] = removeDuplicateVertices(F,V);
+    l = length(F);
+    counter = 1;
+
+% Create a cell array for the edges
+    for i = 1:l
+        currFace = F(i,:);
+        edgeList{counter} = [currFace(1), currFace(2)];
+        edgeList{counter + 1} = [currFace(2), currFace(3)];
+        edgeList{counter + 2} = [currFace(1), currFace(3)];
+        counter = counter + 3;    
+    end
+    totalEdges = counter - 1;
+    % Check for shared edges, if it is shared, push it to another cell array
+    counter = 1;
+    for i = 1:totalEdges
+        repeat = -1;
+        for j = 1:totalEdges
+            if isSameEdge(edgeList{i}, edgeList{j}) == 1
+                repeat = repeat + 1;
+            end
+        end
+    
+        if repeat == 0
+            nonShareEdge(counter, :) = edgeList{i};
+            counter = counter + 1;
+        end
+    end
+    [r,c] = size(nonShareEdge);
+    nonShareEdge = reshape(nonShareEdge,[r * c, 1] );
+    freeVertices = unique(nonShareEdge);
+    
+    vertixIndex = 1:length(V);
+    toReturn = setdiff(vertixIndex, freeVertices);
+end
