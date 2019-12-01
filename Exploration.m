@@ -2,44 +2,44 @@
 f = @(ratio) max(ratio); %Returns the worst quality of all the vertices
 %This is our cost function
 
-circ = stlread('circle_nonrepeat.stl')
+circ = stlread('circle_nonrepeat.stl');
 
 F = circ.faces();
 V = circ.vertices();
 Q = meshQuality(F,V);
-explore(Q,F,V,1)
+explore(Q,F,V,1);
 
-function x_min = explore(Q,F,V,Alpha)
-    % This function returns a new location for the worst quality vertex
-    % INPUT: Vertex -> a 1x3 vector containing vertex coordinates
-    %                   [x1, y1, z1]
-    % INPUT: Quality -> scalar containing the quality of the input vertex
-    % INPUT: Alpha -> step size
-    % OUTPUT: toReturn -> a 1x3 vector containing improved vertex coordinates
-    
-    dir = [1 0 0; 0 1 0; 0 0 1; -1 0 0; 0 -1 0; 0 0 -1; 0 0 0]*Alpha;
-    % Normal directions in 3D space
-    
-    x_min = 0; %Initialized x_min
-    l = size(F,1);
-    for j = 1:l
-        for i = 1:7 %For each normal direction...
-            Vnew = V;
-            
-            Vnew(j,:) = V(j,:) + dir(i,:); %find a new vertex that minimizes cost function        
-
-            q = meshQuality(F,Vnew); %get ratio to determine new quality
-        
-            if ( Q > q ) 
-                Q = q;
-                x_min = Vnew(j,:) % get the new vertex that minimizes quality
-                disp(j)
-            end 
-        end
-    end
-    
-    disp(x_min)
-end
+% function x_min = explore(Q,F,V,Alpha)
+%     % This function returns a new location for the worst quality vertex
+%     % INPUT: Vertex -> a 1x3 vector containing vertex coordinates
+%     %                   [x1, y1, z1]
+%     % INPUT: Quality -> scalar containing the quality of the input vertex
+%     % INPUT: Alpha -> step size
+%     % OUTPUT: toReturn -> a 1x3 vector containing improved vertex coordinates
+%     
+%     dir = [1 0 0; 0 1 0; 0 0 1; -1 0 0; 0 -1 0; 0 0 -1; 0 0 0]*Alpha;
+%     % Normal directions in 3D space
+%     
+%     x_min = 0; %Initialized x_min
+%     
+%     for j = 1:1
+%         for i = 1:7 %For each normal direction...
+%             Vnew = V;
+%             
+%             Vnew(j,:) = V(j,:) + dir(i,:); %find a new vertex that minimizes cost function        
+% 
+%             q = meshQuality(F,Vnew); %get ratio to determine new quality
+%         
+%             if ( Q > q ) 
+%                 Q = q;
+%                 x_min = Vnew(j,:) % get the new vertex that minimizes quality
+%                 disp(j)
+%             end 
+%         end
+%     end
+%     
+%     %disp(x_min)
+% end
 
 function [a,b,c] = sideLength(faceVertices)
 % This function calculates side length of the triangle given vertices

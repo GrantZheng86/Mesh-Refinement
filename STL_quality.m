@@ -40,7 +40,7 @@ clc
 clear variables
 close all
 
-[F, V] = stlread('OLYMPUS XZ-2.STL'); 
+[F, V] = stlread(''); 
 
 % number of faces
 l = size(F, 1);

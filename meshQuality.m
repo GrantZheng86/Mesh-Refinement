@@ -5,6 +5,7 @@ function toReturn = meshQuality(F,V)
 % OUTPUT: toReturn -> a double represent the mesh quality
     l = size(F,1);
     worstCase = 1;
+    
     for i = 1:l
         currFace = F(i,:);
         vert1 = V(currFace(1), :);
@@ -14,12 +15,15 @@ function toReturn = meshQuality(F,V)
         inR = inradius(faceVert);
         ciR = circumradius(faceVert);
         ratio = inR / ciR;
+        
         if ratio < worstCase
             worstCase = ratio;
+            worstFace = i;
         end
     end
     
     toReturn = worstCase;
+    
     
 
 end
