@@ -65,127 +65,64 @@ for i = 1:l
 end
 
 worstCase_usingMethod = meshQuality(F, V); 
-%% This section is used for edge detection
-clc
-clear variables
-close all
+
 
 
 
 %% This section is used for edge vertices detection
-edgeList = {};
-kcounter = 1;
+clc
+clear variables
+close all
+
+[F,V] = stlread('Circle2d allzero.STL');
+[F,V] = removeDuplicateVertices(F,V);
+l = length(F);
+counter = 1;
+
+% Create a cell array for the edges
 for i = 1:l
     currFace = F(i,:);
-    edge(1,:) = [currFace(1),currFace(2)];
-    edge(2,:) = [currFace(2), currFace(3)];
-    edge(3,:) = [currFace(1), currFace(3)];
-    
-    if isempty(edgeList)
-        edgeList{1} = edge(1,:);
-        edgeList{2} = edge(2,:);
-        edgeList{3} = edge(3,:);
-        counter = 4;
-    else
-        for j = 1:3
-            sameCount = 0;
-            sameRecord = -1;
-            for k = 1:length(edgeList)
-                if (isSameEdge(edgeList{k}, edge(j,:))) ~= 0
-                    sameCount = sameCount + 1;
-                    sameRecord = k;
-                end
-            end
-            
-            if sameCount == 0
-                edgeList{counter} = edge(j,:);
-                counter = counter + 1;
-            else
-                repeatedEdge(kcounter) = sameRecord;
-                kcounter = kcounter + 1;
-            end
+    edgeList{counter} = [currFace(1), currFace(2)];
+    edgeList{counter + 1} = [currFace(2), currFace(3)];
+    edgeList{counter + 2} = [currFace(1), currFace(3)];
+    counter = counter + 3;    
+end
+totalEdges = counter - 1;
+% Check for shared edges, if it is shared, push it to another cell array
+counter = 1;
+for i = 1:totalEdges
+    repeat = -1;
+    for j = 1:totalEdges
+        if isSameEdge(edgeList{i}, edgeList{j}) == 1
+            repeat = repeat + 1;
         end
     end
+    
+    if repeat == 0
+        nonShareEdge(counter, :) = edgeList{i};
+        counter = counter + 1;
+    end
 end
+[r,c] = size(nonShareEdge);
+nonShareEdge = reshape(nonShareEdge,[r * c, 1] );
 
-for i = 1:length(repeatedEdge)
-    freeVertices(i,:) = edgeList{repeatedEdge(i)};
-end
-freeVertices = unique(freeVertices);          
+TR = triangulation(F,V);
+figure(1)
+triplot(TR)
+
+freeVertices = findFreeVertices(F,V);
+x = V(freeVertices,1);
+y = V(freeVertices,2);
+figure(1)
+hold on
+plot(x,y,'ro')
+
+
 
 %% This section is used for testing repeating vertices
-[F,V] = stlread('Circle2d.STL');
+[F,V] = stlread('Circle2d allzero.STL');
 temp = uniqueVertices(V);
 
-function toReturn = isRepeat(vert1, vert2)
-% This function tests if the two vertices are the same
-% INPUT: vert1 -> a 3x1 double array indicates the X,Y,Z location of vert1
-%        vert2 -> a 3x1 double array indicates the X,Y,Z location of vert2
-% OUPUT: toReturn -> a binary number that indicates if they are the same or
-%                    not, 1 represent same, 0 represent not
-    dif = zeros(3,1);
-    for i = 1:3
-        dif(i) = abs(vert1(i) - vert2(i));
-    end
-   
-    if sum(dif) < 1e-2
-        toReturn = 1;
-    else 
-        toReturn = 0;
-    end
-end
+%% These is the section for functions
 
-function toReturn = uniqueVertices(vList)
-    [r, ~] = size(vList);
-    toReturn(1,:) = vList(1,:);
-    counter = 2;
-    for i = 1:r
-       sameCount = 0;
-       [currListLength, ~] = size(toReturn);
-       
-       for j = 1:currListLength
-           if isRepeat(vList(i,:), toReturn(j,:)) ~= 0
-               sameCount = sameCount + 1;
-           end
-       end
-       
-       if sameCount == 0
-           toReturn(counter, :) = vList(i, :);
-           counter = counter + 1;
-       end
-    end
-end
-           
-function toReturn = isSameEdge(edge1, edge2)
-
-if (edge1(1) == edge2(1) && edge1(2) == edge2(2))
-    toReturn = 1;
-elseif edge1(1) == edge2(2) && edge1(2) == edge2(1)
-    toReturn = 1;
-else
-    toReturn = 0;
-end
-end
-
-%% This section is used for removing duplicate vertices from STl file import
-
-function [F_n, V_n] = removeDuplicateVertices(F,V)
-    uniqV = uniqueVertices(V);
-    l = length(F);
-    l_u = length(uniqV);
-    tempF = F;
-    for i = 1:l
-        currFace = F(i,:);
-        for j = 1:3
-            currVert = currFace(j);
-            for k = 1:l_u
-                if (isRepeat(V(currVert,:), uniqV(k,:)) ~= 0)
-                    tempF(i,j) = k;
-                end
-            end
-        end
-    end
-    V_n = uniqV;
-    F_n = tempF;
-end
 
