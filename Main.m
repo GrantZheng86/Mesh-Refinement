@@ -3,15 +3,16 @@ clear variables
 close all
 
 %% reading the STL file, remove duplicated vertices and find free vertices
-[F, V] = stlread('badQuality.stl'); 
+[F, V] = stlread('plane.stl'); 
 [F,V] = removeDuplicateVertices(F,V);
 freeVerts = findFreeVertices(F,V);
 freeV_l = length(freeVerts);
+V = disturbFreeVerts(V, freeVerts, 3);
 
 %% Pattern search
 f_init = meshQuality(F,V);
 f_curr = f_init;
-f_des = 0.3;
+f_des = 0.5;
 count = 0;
 
 alpha = 1;
