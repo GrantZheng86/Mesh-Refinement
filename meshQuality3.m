@@ -17,14 +17,14 @@ function toReturn = meshQuality3(F,V, freeV)
         ciR = circumradius(faceVert);
         ratio = inR / ciR;
         
-        if ratio < worstCase && sum(ismember(currFace, freeV))~=3
+        if ratio < worstCase && (sum(ismember(currFace, freeV))>0)
             worstCase = ratio;
             worstFace = i;
         end
         
     end
     
-    toReturn = worstCase;
+    toReturn = real(worstCase);
     
     
 

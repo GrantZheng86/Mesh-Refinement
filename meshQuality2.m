@@ -17,7 +17,7 @@ function toReturn = meshQuality2(F,V)
         sumquality = sumquality+ratio;
     end
     
-    toReturn = sumquality/l;
+    toReturn = real(sumquality/l);
     
     
 
